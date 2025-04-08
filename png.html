@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>شعارات الأندية من ويكيبيديا</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px;
+      background-color: #f4f4f4;
+    }
+    input {
+      padding: 10px;
+      width: 250px;
+      font-size: 18px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    button {
+      padding: 10px 20px;
+      margin-left: 10px;
+      font-size: 18px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    img {
+      margin-top: 30px;
+      max-width: 300px;
+      height: auto;
+      border: 2px solid #ddd;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <h1>احصل على شعار نادي كرة القدم</h1>
+  <input type="text" id="clubInput" placeholder="أدخل اسم النادي">
+  <button onclick="getClubLogo()">ابحث</button>
+  <div id="result"></div>
+
+  <script>
+    async function getClubLogo() {
+      const clubName = document.getElementById("clubInput").value.trim();
+      const resultDiv = document.getElementById("result");
+
+      if (!clubName) {
+        resultDiv.innerHTML = "<p>الرجاء إدخال اسم النادي.</p>";
+        return;
+      }
+
+      const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(clubName)}`;
+
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.thumbnail && data.thumbnail.source) {
+          resultDiv.innerHTML = `
+            <h2>${data.title}</h2>
+            <img src="${data.thumbnail.source}" alt="${data.title} logo">
+          `;
+        } else {
+          resultDiv.innerHTML = "<p>⚠️ لم يتم العثور على شعار.</p>";
+        }
+      } catch (err) {
+        resultDiv.innerHTML = "<p>حدث خطأ أثناء جلب البيانات.</p>";
+        console.error(err);
+      }
+    }
+  </script>
+</body>
+</html>
