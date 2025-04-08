@@ -45,7 +45,7 @@
   </style>
 </head>
 <body>
-  <h1>شعارات الأندية حسب الدوريات</h1>
+  <h1>.شعارات الأندية حسب الدوريات</h1>
   <input type="text" id="search" placeholder="ابحث عن نادي...">
   <div id="content"></div>
 
@@ -176,29 +176,7 @@
 
 
 
-      const grid = document.getElementById("clubsGrid");
-
-    async function loadLogos() {
-      for (let club of clubs) {
-        const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(club)}`;
-        try {
-          const res = await fetch(url);
-          const data = await res.json();
-
-          const card = document.createElement("div");
-          card.className = "card";
-          card.innerHTML = `
-            <strong>${data.title}</strong><br>
-            ${data.thumbnail ? `<img src="${data.thumbnail.source}" alt="${data.title} logo">` : "<p>لا يوجد شعار</p>"}
-          `;
-          grid.appendChild(card);
-        } catch (e) {
-          console.log(`خطأ في تحميل شعار ${club}`);
-        }
-      }
-    }
-
-    loadLogos();
+      
   </script>
 
 
