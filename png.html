@@ -108,7 +108,8 @@
       }
     };
 
-    const container = document.getElementById("content");
+
+     const container = document.getElementById("content");
     const searchInput = document.getElementById("search");
 
     async function fetchLogo(club) {
@@ -138,6 +139,7 @@
           const card = document.createElement("div");
           card.className = "card";
           card.setAttribute("data-name", club.toLowerCase());
+          card.setAttribute("data-club", club);
           card.innerHTML = `
             <strong>${club}</strong><br>
             ${logoUrl ? `<img src="${logoUrl}" alt="${club} logo">` : "<p>لا يوجد شعار</p>"}
@@ -147,18 +149,32 @@
       }
     }
 
-    searchInput.addEventListener("input", function() {
+    searchInput.addEventListener("input", async function () {
       const query = this.value.toLowerCase();
       const cards = document.querySelectorAll(".card");
       cards.forEach(card => {
         const name = card.getAttribute("data-name");
         card.style.display = name.includes(query) ? "block" : "none";
       });
+
+      if (query.length > 2 && !Array.from(cards).some(c => c.style.display === "block")) {
+        const wikiLogo = await fetchLogo(query);
+        if (wikiLogo) {
+          const newCard = document.createElement("div");
+          newCard.className = "card";
+          newCard.innerHTML = `
+            <strong>${query}</strong><br>
+            <img src="${wikiLogo}" alt="${query} logo">
+          `;
+          container.prepend(newCard);
+        }
+      }
     });
 
     displayLeagues();
   </script>
-</body>
+ 
+  </body>
 </html>
 
 
