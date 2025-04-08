@@ -1,21 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>شعارات الأندية تلقائيًا</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>شعارات الأندية حسب الدوريات</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       background-color: #f4f4f4;
       padding: 20px;
+      direction: rtl;
       text-align: center;
+    }
+    h2 {
+      margin-top: 40px;
+      color: #333;
     }
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
       gap: 20px;
-      margin-top: 30px;
+      margin-top: 20px;
     }
     .card {
       background-color: white;
@@ -32,50 +37,76 @@
   </style>
 </head>
 <body>
-  <h1>شعارات أشهر أندية كرة القدم</h1>
-  <div class="grid" id="clubsGrid"></div>
+  <h1>شعارات الأندية حسب الدوريات</h1>
+
+  <div id="content"></div>
 
   <script>
-    const clubs = [
-      "FC Barcelona",
-      "Real Madrid CF",
-      "Manchester United F.C.",
-      "Liverpool F.C.",
-      "Chelsea F.C.",
-      "Manchester City F.C.",
-      "Arsenal F.C.",
-      "Juventus F.C.",
-      "AC Milan",
-      "Inter Milan",
-      "Bayern Munich",
-      "Paris Saint-Germain F.C.",
-      "Ajax Amsterdam",
-      "Borussia Dortmund"
-    ];
+    const leagues = {
+      "الدوري الإنجليزي الممتاز": {
+        logo: "https://upload.wikimedia.org/wikipedia/en/f/f2/Premier_League_Logo.svg",
+        clubs: ["Manchester City F.C.", "Arsenal F.C.", "Liverpool F.C.", "Manchester United F.C.", "Chelsea F.C."]
+      },
+      "الدوري الإسباني": {
+        logo: "https://upload.wikimedia.org/wikipedia/en/0/0e/La_Liga_logo_%282023%29.svg",
+        clubs: ["Real Madrid CF", "FC Barcelona", "Atlético Madrid", "Sevilla FC", "Real Sociedad"]
+      },
+      "الدوري الإيطالي": {
+        logo: "https://upload.wikimedia.org/wikipedia/en/e/e1/Serie_A_logo_%282019%29.svg",
+        clubs: ["Juventus F.C.", "AC Milan", "Inter Milan", "AS Roma", "Napoli"]
+      },
+      "الدوري الألماني": {
+        logo: "https://upload.wikimedia.org/wikipedia/en/d/df/Bundesliga_logo_%282017%29.svg",
+        clubs: ["Bayern Munich", "Borussia Dortmund", "RB Leipzig", "Bayer Leverkusen", "Eintracht Frankfurt"]
+      },
+      "الدوري الفرنسي": {
+        logo: "https://upload.wikimedia.org/wikipedia/en/c/c7/Ligue_1_Uber_Eats_logo.svg",
+        clubs: ["Paris Saint-Germain F.C.", "Olympique de Marseille", "AS Monaco", "Lyon", "Lille OSC"]
+      },
+      "الدوري السعودي": {
+        logo: "https://upload.wikimedia.org/wikipedia/en/9/94/Saudi_Pro_League_logo_2022.svg",
+        clubs: ["Al Hilal SFC", "Al Nassr FC", "Al Ahli Saudi FC", "Al Ittihad Club (Jeddah)", "Al Shabab FC"]
+      }
+    };
 
-    const grid = document.getElementById("clubsGrid");
+    const container = document.getElementById("content");
 
-    async function loadLogos() {
-      for (let club of clubs) {
-        const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(club)}`;
-        try {
-          const res = await fetch(url);
-          const data = await res.json();
+    async function fetchLogo(club) {
+      const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(club)}`;
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        return data.thumbnail ? data.thumbnail.source : null;
+      } catch (err) {
+        return null;
+      }
+    }
 
+    async function displayLeagues() {
+      for (const [leagueName, { logo, clubs }] of Object.entries(leagues)) {
+        const leagueSection = document.createElement("section");
+        leagueSection.innerHTML = `
+          <h2>${leagueName}</h2>
+          <img src="${logo}" alt="${leagueName}" style="height:80px; margin: 10px 0;">
+          <div class="grid" id="${leagueName}"></div>
+        `;
+        container.appendChild(leagueSection);
+
+        const grid = leagueSection.querySelector(".grid");
+        for (const club of clubs) {
+          const logoUrl = await fetchLogo(club);
           const card = document.createElement("div");
           card.className = "card";
           card.innerHTML = `
-            <strong>${data.title}</strong><br>
-            ${data.thumbnail ? `<img src="${data.thumbnail.source}" alt="${data.title} logo">` : "<p>لا يوجد شعار</p>"}
+            <strong>${club}</strong><br>
+            ${logoUrl ? `<img src="${logoUrl}" alt="${club} logo">` : "<p>لا يوجد شعار</p>"}
           `;
           grid.appendChild(card);
-        } catch (e) {
-          console.log(`خطأ في تحميل شعار ${club}`);
         }
       }
     }
 
-    loadLogos();
+    displayLeagues();
   </script>
 </body>
 </html>
