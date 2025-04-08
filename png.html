@@ -34,15 +34,23 @@
       object-fit: contain;
       margin-top: 10px;
     }
+    #search {
+      margin: 20px auto;
+      padding: 10px;
+      width: 300px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
   </style>
 </head>
 <body>
   <h1>شعارات الأندية حسب الدوريات</h1>
-
+  <input type="text" id="search" placeholder="ابحث عن نادي...">
   <div id="content"></div>
 
   <script>
-    const leagues = {
+     const leagues = {
       "الدوري الإنجليزي الممتاز": {
         logo: "https://upload.wikimedia.org/wikipedia/en/f/f2/Premier_League_Logo.svg",
         clubs: ["Manchester City F.C.", "Arsenal F.C.", "Liverpool F.C.", "Manchester United F.C.", "Chelsea F.C."]
@@ -70,6 +78,7 @@
     };
 
     const container = document.getElementById("content");
+    const searchInput = document.getElementById("search");
 
     async function fetchLogo(club) {
       const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(club)}`;
@@ -97,6 +106,7 @@
           const logoUrl = await fetchLogo(club);
           const card = document.createElement("div");
           card.className = "card";
+          card.setAttribute("data-name", club.toLowerCase());
           card.innerHTML = `
             <strong>${club}</strong><br>
             ${logoUrl ? `<img src="${logoUrl}" alt="${club} logo">` : "<p>لا يوجد شعار</p>"}
@@ -106,7 +116,17 @@
       }
     }
 
+    searchInput.addEventListener("input", function() {
+      const query = this.value.toLowerCase();
+      const cards = document.querySelectorAll(".card");
+      cards.forEach(card => {
+        const name = card.getAttribute("data-name");
+        card.style.display = name.includes(query) ? "block" : "none";
+      });
+    });
+
     displayLeagues();
   </script>
 </body>
 </html>
+
